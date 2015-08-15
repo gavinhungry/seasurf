@@ -1,6 +1,6 @@
 {
   "name": "seasurf",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "author": "Gavin Lloyd <gavinhungry@gmail.com>",
   "description": "CSRF session middleware",
   "license": "MIT",
