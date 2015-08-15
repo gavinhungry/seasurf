@@ -1,0 +1,23 @@
+{
+  "name": "seasurf",
+  "version": "0.0.0",
+  "author": "Gavin Lloyd <gavinhungry@gmail.com>",
+  "description": "CSRF session middleware",
+  "license": "MIT",
+
+  "keywords": [
+    "csrf"
+  ],
+
+  "homepage": "https://github.com/gavinhungry/seasurf",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/gavinhungry/seasurf.git"
+  },
+
+  "main": "seasurf.js",
+
+  "dependencies": {
+    "csrf": "3.0.x"
+  }
+}
