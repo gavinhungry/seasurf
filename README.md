@@ -1,6 +1,6 @@
 seasurf
 =======
-Some CSRF session middleware.
+CSRF session middleware.
 
 Installation
 ------------
