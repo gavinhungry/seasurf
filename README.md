@@ -14,7 +14,9 @@ Usage
 var seasurf = require('seasurf');
 
 // All paths past this point have access to the csrfToken method
-app.use(seasurf({ // see Options });
+app.use(seasurf({
+  // see Options
+});
 ```
 
 Options
