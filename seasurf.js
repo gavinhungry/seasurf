@@ -14,7 +14,7 @@
 
     opts.session = opts.session || 'session';
 
-    opts.getToken = opts.getToken || function(req) {
+    opts.token = opts.token || function(req, res) {
       return req.headers['x-csrf-token'];
     };
 
@@ -48,7 +48,7 @@
       });
 
       if (verifyPath && verifyMethod) {
-        var token = opts.getToken(req);
+        var token = opts.token(req, res);
 
         if (!tokens.verify(csrfSecret, token)) {
           return opts.unverified(req, res);
