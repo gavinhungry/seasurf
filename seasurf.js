@@ -6,7 +6,6 @@
 (function() {
   'use strict';
 
-  var _ = require('underscore');
   var tokens = require('csrf')();
 
   var seasurf = function (opts) {
@@ -25,7 +24,7 @@
     var getSessionSecret = function(req) {
       var session = req[opts.session];
       if (!session) {
-        throw new Error('no session');
+        return null;
       }
 
       session.csrfSecret = session.csrfSecret || tokens.secretSync();
@@ -34,16 +33,19 @@
 
     return function(req, res, next) {
       var csrfSecret = getSessionSecret(req);
+      if (!csrfSecret) {
+        return opts.unverified(req, res);
+      }
 
       req.csrfToken = function() {
         return tokens.create(csrfSecret);
       };
 
-      var verifyPath = !opts.paths || _.some(opts.paths, function(path) {
+      var verifyPath = !opts.paths || opts.paths.some(function(path) {
         return !req.path.indexOf(path) || path === '*';
       });
 
-      var verifyMethod = !opts.methods || _.some(opts.methods, function(method) {
+      var verifyMethod = !opts.methods || opts.methods.some(function(method) {
         return req.method === method.toUpperCase();
       });
 
