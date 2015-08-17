@@ -6,26 +6,59 @@
 (function() {
   'use strict';
 
+  var _ = require('underscore');
   var tokens = require('csrf')();
 
-  module.exports = function seasurf(path) {
+  var seasurf = function (opts) {
+    opts = opts || {};
+
+    opts.session = opts.session || 'session';
+
+    opts.getToken = opts.getToken || function(req) {
+      return req.headers['x-csrf-token'];
+    };
+
+    opts.unverified = opts.unverified || function(req, res) {
+      res.status(403).end();
+    };
+
+    var getSessionSecret = function(req) {
+      var session = req[opts.session];
+      if (!session) {
+        throw new Error('no session');
+      }
+
+      session.csrfSecret = session.csrfSecret || tokens.secretSync();
+      return session.csrfSecret;
+    };
+
     return function(req, res, next) {
-      req.session.csrfSecret = req.session.csrfSecret || tokens.secretSync();
+      var csrfSecret = getSessionSecret(req);
 
       req.csrfToken = function() {
-        return tokens.create(req.session.csrfSecret);
+        return tokens.create(csrfSecret);
       };
 
-      if (path && req.path.indexOf(path) === 0) {
-        var token = req.headers['x-csrf-token'];
+      var verifyPath = !opts.paths || _.some(opts.paths, function(path) {
+        return !req.path.indexOf(path) || path === '*';
+      });
 
-        if (!tokens.verify(req.session.csrfSecret, token)) {
-          return res.status(403).end();
+      var verifyMethod = !opts.methods || _.some(opts.methods, function(method) {
+        return req.method === method.toUpperCase();
+      });
+
+      if (verifyPath && verifyMethod) {
+        var token = opts.getToken(req);
+
+        if (!tokens.verify(csrfSecret, token)) {
+          return opts.unverified(req, res);
         }
       }
 
       next();
-    }
+    };
   };
+
+  module.exports = seasurf;
 
 })();
